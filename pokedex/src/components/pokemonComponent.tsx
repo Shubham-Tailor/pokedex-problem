@@ -8,7 +8,7 @@ const PokemonComponent: React.FC = () => {
   const [pokemonData, setPokemonData] = useState<{ id: number; name: string; types: string[]; sprite: string } | null>(null);
 
 
-  const { data, error, isLoading } = trpc.pokemon.getPokemon.useQuery(pokemonName, {
+  const { error, isLoading } = trpc.pokemon.getPokemon.useQuery(pokemonName, {
     enabled: !!pokemonName, // Only run the query if pokemonName is not empty
     onSuccess: (data) => {
       setPokemonData(data);
