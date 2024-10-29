@@ -4,7 +4,9 @@ import PokemonRow from './PokemonRow';
 
 const PokemonComponent: React.FC = () => {
   const [pokemonName, setPokemonName] = useState('');
-  const [pokemonData, setPokemonData] = useState<any>(null);
+  // const [pokemonData, setPokemonData] = useState<any>(null);
+  const [pokemonData, setPokemonData] = useState<{ id: number; name: string; types: string[]; sprite: string } | null>(null);
+
 
   const { data, error, isLoading } = trpc.pokemon.getPokemon.useQuery(pokemonName, {
     enabled: !!pokemonName, // Only run the query if pokemonName is not empty
