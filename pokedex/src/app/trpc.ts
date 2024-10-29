@@ -1,5 +1,5 @@
 import { initTRPC } from '@trpc/server';
-import { pokemonRouter } from './routers/pokemonRouter';
+import { pokemonRouter } from '../server/pokemonRouter';
 
 const t = initTRPC.create();
 
