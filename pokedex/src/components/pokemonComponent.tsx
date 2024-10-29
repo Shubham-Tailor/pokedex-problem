@@ -1,17 +1,48 @@
-import { trpc } from '../utils/trpc';
+import React, { useState } from 'react';
+import { trpc } from '../utils/trpc'; // Ensure the path is correct
+import PokemonRow from './PokemonRow';
 
-const PokemonComponent = () => {
-  const { data, isLoading, error } = trpc.pokemon.getPokemon.useQuery('Raichu');
+const PokemonComponent: React.FC = () => {
+  const [pokemonName, setPokemonName] = useState('');
+  const [pokemonData, setPokemonData] = useState<any>(null);
 
-  if (isLoading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error.message}</div>; // Check for errors
-  if (!data) return <div>Pokémon not found</div>;
+  const { data, error, isLoading } = trpc.pokemon.getPokemon.useQuery(pokemonName, {
+    enabled: !!pokemonName, // Only run the query if pokemonName is not empty
+    onSuccess: (data) => {
+      setPokemonData(data);
+    },
+    onError: () => {
+      setPokemonData(null); // Clear previous data if there's an error
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // The query will run automatically due to the 'enabled' option above
+  };
 
   return (
     <div>
-      <h1>{data.name}</h1>
-      <img src={data.sprite} alt={data.name} />
-      <p>Types: {data.types.join(', ')}</p>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={pokemonName}
+          onChange={(e) => setPokemonName(e.target.value)}
+          placeholder="Enter Pokémon name"
+        />
+        <button type="submit">Get Pokémon</button>
+      </form>
+
+      {isLoading && <p>Loading...</p>}
+      {error && <p>Error fetching Pokémon: {error.message}</p>}
+      {pokemonData && (
+        <PokemonRow
+          id={pokemonData.id}
+          name={pokemonData.name}
+          types={pokemonData.types}
+          sprite={pokemonData.sprite}
+        />
+      )}
     </div>
   );
 };
