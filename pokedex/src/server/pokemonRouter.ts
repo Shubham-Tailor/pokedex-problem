@@ -1,32 +1,63 @@
 import { initTRPC } from '@trpc/server';
 import { z } from 'zod';
 import { PrismaClient } from '@prisma/client';
-import { procedure, router } from '../server/trpc';
 
 const prisma = new PrismaClient();
 const t = initTRPC.create();
 
-export const pokemonRouter = router({
-  getPokemon: procedure
-    .input(z.string()) // Expecting a single Pokemon name as input
-    .query(async ({ input, ctx }) => {
-      console.log('Input received:', input);
-      const pokemon = await ctx.prisma.pokemon.findUnique({
+export const pokemonRouter = t.router({
+  getPokemon: t.procedure
+    .input(z.string()) // Expecting a single Pokémon name as input
+    .query(async ({ input }) => {
+      const pokemon = await prisma.pokemon.findUnique({
         where: { name: input },
       });
-      console.log('Returned Pokemon:', pokemon);
-      return pokemon;
+
+      if (!pokemon) {
+        throw new Error("Pokémon not found");
+      }
+
+      return {
+        id: pokemon.id,
+        name: pokemon.name,
+        types: pokemon.types,
+        sprite: pokemon.sprite,
+      };
     }),
 
-  // getPokemonArray: t.procedure
-  //   .input(z.array(z.string())) // Expecting an array of Pokemon names
-  //   .query(async ({ input }) => {
-  //     console.log('Input received:', input);
-  //     const pokemonArray = await prisma.pokemon.findMany({
-  //       where: {
-  //         name: { in: input },
-  //       },
-  //     });
-  //     return pokemonArray;
-  //   }),
+    getPokemonArray: t.procedure
+    .input(z.array(z.string())) // Expecting an array of Pokémon names
+    .query(async ({ input }) => {
+      const pokemonArray = await prisma.pokemon.findMany({
+        where: {
+          name: { in: input },
+        },
+      });
+
+      return pokemonArray.map(pokemon => ({
+        id: pokemon.id,
+        name: pokemon.name,
+        types: pokemon.types,
+        sprite: pokemon.sprite,
+      }));
+    }),
+
+    getPokemonByType: t.procedure
+    .input(z.string())
+    .query(async ({ input }) => {
+      const pokemonArray = await prisma.pokemon.findMany({
+        where: {
+          types: {
+            has: input, // Assuming 'types' is an array of strings
+          },
+        },
+      });
+
+      return pokemonArray.map(pokemon => ({
+        id: pokemon.id,
+        name: pokemon.name,
+        types: pokemon.types,
+        sprite: pokemon.sprite,
+      }));
+    }),
 });

@@ -1,12 +1,16 @@
-import PokemonComponent from '../components/pokemonComponent'; // Adjust the path if necessary
+import PokemonComponent from '../components/pokemonComponent';
+import PokedexComponent from '../components/PokedexComponent';
+import FilterablePokedexTable from '../components/FilterablePokedexTable';
 
-const Home = () => {
+const HomePage: React.FC = () => {
   return (
     <div>
-      <h1>Welcome to the Pokedex!</h1>
+      <h1>Pokédex</h1>
       <PokemonComponent />
+      <PokedexComponent />
+      <FilterablePokedexTable />
     </div>
   );
 };
 
-export default Home;
+export default HomePage;
