@@ -1,9 +1,10 @@
 import { trpc } from '../utils/trpc';
 
 const PokemonComponent = () => {
-  const { data, isLoading } = trpc.pokemon.getPokemon.useQuery('Bulbasaur');
+  const { data, isLoading, error } = trpc.pokemon.getPokemon.useQuery('Raichu');
 
   if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>; // Check for errors
   if (!data) return <div>Pokémon not found</div>;
 
   return (
